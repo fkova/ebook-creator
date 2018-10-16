@@ -1,3 +1,4 @@
+import gui.MainForm;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -7,10 +8,11 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
+import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class Starter {
+public class Main {
 
 //    private static String URL="http://www.wuxiaworld.com/wmw-index/wmw-chapter-";
 //    private static String URL="http://www.wuxiaworld.com/novel/against-the-gods/atg-chapter-";
@@ -25,7 +27,13 @@ public class Starter {
     private static int endIndex=900; //1195
     private static StringBuilder sb= new StringBuilder();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
+        MainForm form = new MainForm();
+
+        //ConsolTest();
+    }
+
+    private static void ConsolTest() {
         String [] tmb=URL.split("/");
         ArrayUtils.reverse(tmb);
         String novel_name= tmb[1];
@@ -66,6 +74,10 @@ public class Starter {
                 new FileOutputStream(filename), StandardCharsets.UTF_8))) {
             writer.write(sb.toString());
             //.replaceAll("\n+","\n\n").replaceAll("[\r\n]+", "\n\n").replaceAll("Previous Chapter","")
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         System.out.println("\n"+filename+" created!");
