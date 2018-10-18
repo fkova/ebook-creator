@@ -128,9 +128,13 @@ public class MainForm extends JFrame {
                     e1.printStackTrace();
                 }
 
+                String [] tmb = returnValue.split("/");
+                ArrayUtils.reverse(tmb);
+                String novel_name= tmb[1];
+
                 if(!returnValue.equals("")){
-                    novels.put(uri.getHost(),returnValue);
-                    cbNovel.addItem(uri.getHost());
+                    novels.put(novel_name+" ("+uri.getHost()+")",returnValue);
+                    cbNovel.addItem(novel_name+" ("+uri.getHost()+")");
                 }
 
             }
