@@ -35,13 +35,6 @@
             <version>1.10.2</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
-        </dependency>
-
         <dependency>
             <groupId>nl.siegmann.epublib</groupId>
             <artifactId>epublib-core</artifactId>

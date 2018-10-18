@@ -37,10 +37,19 @@ public class Fetch {
             Document doc = Jsoup.connect(fullUrl+"/").userAgent("Mozilla/5.0").timeout(10000).followRedirects(true).get();
             Element div = doc.select("div.chapter-content3 > div.desc").first();
 
+
             for(Node e : div.childNodes()){
                 if (e instanceof TextNode) {
-                    sb.append(((TextNode)e).text()+"\r\n");
+                    if(((TextNode) e).text().contains("Chapter") && ((TextNode) e).text().trim().length()<15){
+                        continue;
+                    }else if(((TextNode) e).text().startsWith("Translator:")){
+                        continue;
+                    }else{
+                        sb.append(((TextNode)e).text());
+                    }
                 }else if(e instanceof Element && ((Element) e).tagName().equals("p")){
+                    sb.append(((Element) e).text()+"\r\n");
+                }else if(e instanceof Element && ((Element) e).tagName().equals("br")){
                     sb.append(((Element) e).text()+"\r\n");
                 }
             }

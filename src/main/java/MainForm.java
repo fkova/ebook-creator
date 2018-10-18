@@ -1,12 +1,18 @@
+import gui.AddSourceDialog;
 import helpers.Fetch;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class MainForm extends JFrame {
@@ -18,8 +24,10 @@ public class MainForm extends JFrame {
     private JButton btCreateTxt;
     private JScrollPane spMain;
     private JTextArea textArea;
+    private JButton addSourceButton;
     private Map<String, String> novels = new TreeMap<>();
-    private boolean toFile;
+    private boolean toFile=false;
+    private Properties properties = new Properties();
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -34,21 +42,31 @@ public class MainForm extends JFrame {
         super(title);
         setContentPane(panel_main);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 400);
+        setSize(400, 500);
         setLocationRelativeTo(null);
 
         init();
         setEventListeners();
-
         setVisible(true);
     }
 
     private void init() {
-        novels.put("Release that Witch / REDLIGHTNOVEL", "https://www.readlightnovel.org/release-that-witch/chapter-");
-        novels.put("Against the Gods / WUXIAWORLD", "http://www.wuxiaworld.com/novel/against-the-gods/atg-chapter-");
-        novels.put("Wu dong qian kun / WUXIAWORLD", "https://www.wuxiaworld.com/novel/wu-dong-qian-kun/wdqk-chapter-");
-        novels.put("Overgeared / WUXIAWORLD", "https://www.wuxiaworld.com/novel/overgeared/og-chapter-");
-        toFile=false;
+        //load novels
+
+        try {
+            properties.load(new FileInputStream("novels.properties"));
+
+            for (String key : properties.stringPropertyNames()) {
+                novels.put(key, properties.get(key).toString());
+            }
+
+            System.out.println("loading novels succesful!");
+        } catch (IOException e) {
+            novels.put("Release that Witch / REDLIGHTNOVEL", "https://www.readlightnovel.org/release-that-witch/chapter-");
+            novels.put("Against the Gods / WUXIAWORLD", "http://www.wuxiaworld.com/novel/against-the-gods/atg-chapter-");
+            novels.put("Wu dong qian kun / WUXIAWORLD", "https://www.wuxiaworld.com/novel/wu-dong-qian-kun/wdqk-chapter-");
+            novels.put("Overgeared / WUXIAWORLD", "https://www.wuxiaworld.com/novel/overgeared/og-chapter-");
+        }
 
         for (String key : novels.keySet()) {
             cbNovel.addItem(key);
@@ -91,6 +109,46 @@ public class MainForm extends JFrame {
                     btCreateTxt.setEnabled(false);
                     toFile=true;
                     new Parser().execute();
+                }
+            }
+        });
+
+        addSourceButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AddSourceDialog dialog = new AddSourceDialog();
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                URI uri = null;
+                String returnValue=dialog.tfUrl.getText();
+                try {
+                    uri = new URI(returnValue);
+                } catch (URISyntaxException e1) {
+                    e1.printStackTrace();
+                }
+
+                if(!returnValue.equals("")){
+                    novels.put(uri.getHost(),returnValue);
+                    cbNovel.addItem(uri.getHost());
+                }
+
+            }
+        });
+
+        addWindowListener(new WindowAdapter() {
+
+            //saving novels
+            public void windowClosing(WindowEvent e) {
+                try {
+                    for (Map.Entry<String,String> entry : novels.entrySet()) {
+                        properties.put(entry.getKey(), entry.getValue());
+                    }
+
+                    properties.store(new FileOutputStream("novels.properties"), null);
+                    System.out.println("save successful!");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
             }
         });
@@ -151,8 +209,10 @@ public class MainForm extends JFrame {
         @Override
         protected void process(List<Integer> chunks) {
             int i = chunks.get(chunks.size()-1);
-            int diff = max-min;
-            textArea.setText((int)(((double)i-min)/diff*100) +"%");
+            int diff = max-min+1;
+            textArea.setText(
+                    (int)(((double)i-min+1)/diff*100
+            ) +"%");
         }
 
         @Override
