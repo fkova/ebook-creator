@@ -1,5 +1,5 @@
-import gui.MainForm;
-import org.apache.commons.lang3.ArrayUtils;
+package helpers;
+
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -8,31 +8,11 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
-import javax.swing.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
-public class Main {
-
-//    private static String URL="http://www.wuxiaworld.com/wmw-index/wmw-chapter-";
-//    private static String URL="http://www.wuxiaworld.com/novel/against-the-gods/atg-chapter-";
-//    private static String URL="https://www.wuxiaworld.com/novel/wu-dong-qian-kun/wdqk-chapter-";
-//    private static String URL="http://volarenovels.com/release-that-witch/rw-chapter-";
-    private static String URL="https://www.readlightnovel.org/release-that-witch/chapter-";
-//    private static String URL="https://www.readlightnovel.org/everyone-else-is-a-returnee/chapter-";
-//    private static String URL="http://www.wuxiaworld.com/martialworld-index/mw-chapter-";
-//    private static String URL= "https://www.wuxiaworld.com/novel/overgeared/og-chapter-";
-
-    private static int startIndex=859;
-    private static int endIndex=900; //1195
-    private static StringBuilder sb= new StringBuilder();
-
-    public static void main(String[] args){
-        MainForm form = new MainForm();
-
-        //ConsolTest();
-    }
-
+public class Fetch {
+    private static StringBuilder sb;
+    /*
     private static void ConsolTest() {
         String [] tmb=URL.split("/");
         ArrayUtils.reverse(tmb);
@@ -82,32 +62,55 @@ public class Main {
 
         System.out.println("\n"+filename+" created!");
     }
+*/
+    public static StringBuilder fetchNovel(String url, int chapter) {
+        sb = new StringBuilder();
+        boolean status=false;
 
-    private static boolean fetchRedlight(int i){
+        if (url.contains("wuxiaworld.com")) {
+            status=fetchWuxia(""+url+chapter);
+        } else if (url.contains("volarenovels.com")) {
+            status=fetchVolar(""+url+chapter);
+        } else if (url.contains("readlightnovel.org")) {
+            status=fetchRedlight(""+url+chapter);
+        }
+
+        if(status){
+            return sb;
+        }
+
+        return null;
+    }
+
+
+
+    private static boolean fetchRedlight(String fullUrl){
         try {
-            Document doc = Jsoup.connect(URL+i+"/").userAgent("Mozilla/5.0").timeout(10000).followRedirects(true).get();
+            Document doc = Jsoup.connect(fullUrl+"/").userAgent("Mozilla/5.0").timeout(10000).followRedirects(true).get();
             Element div = doc.select("div.chapter-content3 > div.desc").first();
 
             for(Node e : div.childNodes()){
                 if (e instanceof TextNode) {
-                    sb.append(((TextNode)e).text()+"\r\n\r\n");
+                    sb.append(((TextNode)e).text()+"\r\n");
                 }else if(e instanceof Element && ((Element) e).tagName().equals("p")){
-                    sb.append(((Element) e).text()+"\r\n\r\n");
+                    sb.append(((Element) e).text()+"\r\n");
                 }
             }
             sb.append("\n");
         } catch (HttpStatusException e){
+            e.printStackTrace();
             return false;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
         return true;
     }
 
-    private static boolean fetchVolar(int i) {
+    private static boolean fetchVolar(String fullUrl) {
         Document doc;
         try {
-            doc = Jsoup.connect(URL+i+"/").userAgent("Mozilla/5.0").timeout(5000).followRedirects(true).get();
+            doc = Jsoup.connect(fullUrl+"/").userAgent("Mozilla/5.0").timeout(5000).followRedirects(true).get();
 
             Elements div = doc.select("div.entry-content");
             div.select("p:lt(2)").remove();
@@ -124,10 +127,10 @@ public class Main {
         return true;
     }
 
-    private static boolean fetchWuxia(int i) {
+    private static boolean fetchWuxia(String fullUrl) {
         Document doc;
         try {
-            doc = Jsoup.connect(URL+i+"/").userAgent("Mozilla/5.0").timeout(5000).followRedirects(true).get();
+            doc = Jsoup.connect(fullUrl+"/").userAgent("Mozilla/5.0").timeout(5000).followRedirects(true).get();
             Elements div = doc.select("div[class=fr-view] > p");
             String chapter = doc.select("div.caption > div > h4").first().text();
 
@@ -161,26 +164,5 @@ public class Main {
 
         return true;
     }
-
-
-    /*
-    public static String offlineFetch(int page) throws IOException {
-        Document doc = Jsoup.connect("https://www.google.hu/?gfe_rd=cr&ei=7bTnWI-5MPSv8wflq4rgCQ#q=emperor+"+page+"+wuxiaworld").get();
-
-        Elements links = doc.select("a[href]");
-        for (Element link : links) {
-
-            String temp = link.attr("href");
-            if(temp.startsWith("/url?q=")){
-                System.out.println(link.text().toString()+"wtf");
-            }
-
-        }
-
-        //Element link = doc.select("li.action-menu-item.ab_dropdownitem > a[href]").first();
-
-        return "pagetext";
-    }
-    */
 
 }
