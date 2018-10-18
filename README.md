@@ -1,2 +1,3 @@
 # ebook-creator
-Creates offline ebooks from url-s, main sources are chinese or korean webnovels
+Swing app that generates ebooks from url-s. 
+Main sources are chinese or korean webnovels
