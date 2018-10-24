@@ -1,3 +1,3 @@
 # ebook-creator
 Swing app to fetch chinese or korean web-novels.
-![Screenshot](cover.png)
+![alt text](cover.PNG "desc")
