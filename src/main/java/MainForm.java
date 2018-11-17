@@ -66,6 +66,8 @@ public class MainForm extends JFrame {
             novels.put("Against the Gods / WUXIAWORLD", "http://www.wuxiaworld.com/novel/against-the-gods/atg-chapter-");
             novels.put("Wu dong qian kun / WUXIAWORLD", "https://www.wuxiaworld.com/novel/wu-dong-qian-kun/wdqk-chapter-");
             novels.put("Overgeared / WUXIAWORLD", "https://www.wuxiaworld.com/novel/overgeared/og-chapter-");
+            novels.put("Trash of the Counts Family / WUXIAWORLD", "https://www.wuxiaworld.com/novel/trash-of-the-counts-family/tcf-chapter-");
+            novels.put("The Novels Extra / WUXIAWORLD", "https://www.wuxiaworld.com/novel/the-novels-extra/tne-chapter-");
         }
 
         for (String key : novels.keySet()) {
@@ -107,6 +109,8 @@ public class MainForm extends JFrame {
                 } else {
                     btTestParsing.setEnabled(false);
                     btCreateTxt.setEnabled(false);
+                    cbMin.setEnabled(false);
+                    cbMax.setEnabled(false);
                     toFile=true;
                     new Parser().execute();
                 }
@@ -225,6 +229,8 @@ public class MainForm extends JFrame {
 
             btTestParsing.setEnabled(true);
             btCreateTxt.setEnabled(true);
+            cbMax.setEnabled(true);
+            cbMin.setEnabled(true);
 
             try {
                 status = get();

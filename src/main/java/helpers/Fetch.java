@@ -92,11 +92,13 @@ public class Fetch {
             doc = Jsoup.connect(fullUrl+"/").userAgent("Mozilla/5.0").timeout(5000).followRedirects(true).get();
             Elements div = doc.select("div[class=fr-view] > p");
             String chapter = doc.select("div.caption > div > h4").first().text();
+            sb.append(chapter+"\r\n\r\n") ;
 
             int cnt=1;
             for(Element e : div){
                 if(e.text().contains("Glossary of Common Korean Terms.")) break;
-
+                sb.append(e.text()+"\r\n\r\n");
+                /*
                 if(cnt==1){
                     if(!e.text().contains(chapter)){
                         sb.append(chapter+"\r\n\r\n") ;
@@ -107,6 +109,7 @@ public class Fetch {
                     sb.append(e.text()+"\r\n\r\n");
                 }
                cnt--;
+               */
             }
         } catch (HttpStatusException e){
             e.printStackTrace();
