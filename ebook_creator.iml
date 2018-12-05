@@ -18,5 +18,11 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.8.1" level="project" />
+    <orderEntry type="library" name="Maven: com.intellij:forms_rt:6.0.5" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-commons:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-tree:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm:2.2.3" level="project" />
+    <orderEntry type="library" name="Maven: com.jgoodies:forms:1.0.7" level="project" />
+    <orderEntry type="library" name="Maven: jdom:jdom:1.0" level="project" />
   </component>
 </module>
