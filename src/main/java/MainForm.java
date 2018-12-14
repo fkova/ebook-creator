@@ -2,6 +2,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import gui.AddSourceDialog;
 import helpers.Fetch;
+import nl.siegmann.epublib.domain.Book;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
@@ -28,9 +29,11 @@ public class MainForm extends JFrame {
     private JScrollPane spMain;
     private JTextArea textArea;
     private JButton addSourceButton;
+    private JButton btCreateEpub;
     private Map<String, String> novels = new TreeMap<>();
-    private boolean toFile = false;
+    //private boolean toFile = false;
     private Properties properties = new Properties();
+    private Fetch parser;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -47,6 +50,8 @@ public class MainForm extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 500);
         setLocationRelativeTo(null);
+
+        parser = new Fetch();
 
         init();
         setEventListeners();
@@ -82,6 +87,8 @@ public class MainForm extends JFrame {
             cbMin.addItem(i);
             cbMax.addItem(i);
         }
+
+        btCreateEpub.setEnabled(false);
     }
 
     private void setEventListeners() {
@@ -96,8 +103,7 @@ public class MainForm extends JFrame {
                 } else {
                     btTestParsing.setEnabled(false);
                     btCreateTxt.setEnabled(false);
-                    toFile = false;
-                    new Parser().execute();
+                    new Parser(false).execute();
                 }
             }
         });
@@ -115,8 +121,25 @@ public class MainForm extends JFrame {
                     btCreateTxt.setEnabled(false);
                     cbMin.setEnabled(false);
                     cbMax.setEnabled(false);
-                    toFile = true;
-                    new Parser().execute();
+                    new Parser(true).execute();
+                }
+            }
+        });
+
+        btCreateEpub.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int min = Integer.parseInt(cbMin.getSelectedItem().toString());
+                int max = Integer.parseInt(cbMax.getSelectedItem().toString());
+
+                if (min > max) {
+                    textArea.setText("Error: Min Chapter can't be larger than max!");
+                } else {
+                    btTestParsing.setEnabled(false);
+                    btCreateTxt.setEnabled(false);
+                    cbMin.setEnabled(false);
+                    cbMax.setEnabled(false);
+                    new Parser(true).execute();
                 }
             }
         });
@@ -211,7 +234,7 @@ public class MainForm extends JFrame {
      */
     private void $$$setupUI$$$() {
         panel_main = new JPanel();
-        panel_main.setLayout(new GridLayoutManager(8, 2, new Insets(10, 10, 10, 10), -1, -1));
+        panel_main.setLayout(new GridLayoutManager(9, 2, new Insets(10, 10, 10, 10), -1, -1));
         cbMin = new JComboBox();
         panel_main.add(cbMin, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         cbMax = new JComboBox();
@@ -227,7 +250,7 @@ public class MainForm extends JFrame {
         panel_main.add(btCreateTxt, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spMain = new JScrollPane();
         spMain.setHorizontalScrollBarPolicy(31);
-        panel_main.add(spMain, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        panel_main.add(spMain, new GridConstraints(8, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         textArea = new JTextArea();
         textArea.setLineWrap(true);
         textArea.setText("Welcome");
@@ -241,6 +264,9 @@ public class MainForm extends JFrame {
         addSourceButton = new JButton();
         addSourceButton.setText("Add Source");
         panel_main.add(addSourceButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        btCreateEpub = new JButton();
+        btCreateEpub.setText("Create Ebook (epub)");
+        panel_main.add(btCreateEpub, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
@@ -256,12 +282,17 @@ public class MainForm extends JFrame {
         private int max = Integer.parseInt(cbMax.getSelectedItem().toString());
         private StringBuilder fullText = new StringBuilder();
         private String text;
+        private Boolean tofile;
+
+        Parser(boolean tofile) {
+            this.tofile = tofile;
+        }
 
         @Override
         protected Boolean doInBackground() {
 
             for (int i = min; i <= max; i++) {
-                text = Fetch.fetchNovel(url, i);
+                text = parser.fetchNovel(url, i);
                 if (text == null) {
                     return false;
                 } else {
@@ -295,7 +326,7 @@ public class MainForm extends JFrame {
                 status = get();
                 if (status) {
                     textArea.setText(fullText.toString());
-                    if (toFile) {
+                    if (tofile) {
                         createTxt();
                     }
                 } else {

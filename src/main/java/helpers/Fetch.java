@@ -1,5 +1,6 @@
 package helpers;
 
+import nl.siegmann.epublib.domain.Book;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,9 +12,10 @@ import org.jsoup.select.Elements;
 import java.io.*;
 
 public class Fetch {
-    private static StringBuilder sb;
+    private StringBuilder sb;
+    private String title;
 
-    public static String fetchNovel(String url, int chapter) {
+    public String fetchNovel(String url, int chapter) {
         sb = new StringBuilder();
         boolean status=false;
 
@@ -32,7 +34,7 @@ public class Fetch {
         return null;
     }
 
-    private static boolean fetchRedlight(String fullUrl){
+    private boolean fetchRedlight(String fullUrl){
         try {
             Document doc = Jsoup.connect(fullUrl+"/").userAgent("Mozilla/5.0").timeout(10000).followRedirects(true).get();
             Element div = doc.select("div.chapter-content3 > div.desc").first();
@@ -64,7 +66,7 @@ public class Fetch {
         return true;
     }
 
-    private static boolean fetchVolar(String fullUrl) {
+    private boolean fetchVolar(String fullUrl) {
         Document doc;
         try {
             doc = Jsoup.connect(fullUrl+"/").userAgent("Mozilla/5.0").timeout(5000).followRedirects(true).get();
@@ -86,30 +88,20 @@ public class Fetch {
         return true;
     }
 
-    private static boolean fetchWuxia(String fullUrl) {
+    private boolean fetchWuxia(String fullUrl) {
         Document doc;
         try {
             doc = Jsoup.connect(fullUrl+"/").userAgent("Mozilla/5.0").timeout(5000).followRedirects(true).get();
-            Elements div = doc.select("div[class=fr-view] > p");
-            String chapter = doc.select("div.caption > div > h4").first().text();
-            sb.append(chapter+"\r\n\r\n") ;
+            Element text=doc.select("div[class=fr-view]").first();
+            Elements elements = text.select("div[class=fr-view] > p");
+            title = doc.select("div.caption > div > h4").first().text();
 
-            int cnt=1;
-            for(Element e : div){
+            sb.append(title+"\r\n\r\n") ;
+
+            for(Element e : elements){
                 if(e.text().contains("Glossary of Common Korean Terms.")) break;
                 sb.append(e.text()+"\r\n\r\n");
-                /*
-                if(cnt==1){
-                    if(!e.text().contains(chapter)){
-                        sb.append(chapter+"\r\n\r\n") ;
-                    }else{
-                        sb.append(e.text()+"\r\n\r\n");
-                    }
-                }else{
-                    sb.append(e.text()+"\r\n\r\n");
-                }
-               cnt--;
-               */
+
             }
         } catch (HttpStatusException e){
             e.printStackTrace();
