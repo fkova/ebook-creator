@@ -2,7 +2,6 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import gui.AddSourceDialog;
 import helpers.Fetch;
-import nl.siegmann.epublib.domain.Book;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
@@ -29,8 +28,7 @@ public class MainForm extends JFrame {
     private JScrollPane spMain;
     private JTextArea textArea;
     private JButton addSourceButton;
-    private JButton btCreateEpub;
-    private Map<String, String> novels = new TreeMap<>();
+    public Map<String, String> novels = new TreeMap<>();
     //private boolean toFile = false;
     private Properties properties = new Properties();
     private Fetch parser;
@@ -88,7 +86,6 @@ public class MainForm extends JFrame {
             cbMax.addItem(i);
         }
 
-        btCreateEpub.setEnabled(false);
     }
 
     private void setEventListeners() {
@@ -109,24 +106,6 @@ public class MainForm extends JFrame {
         });
 
         btCreateTxt.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int min = Integer.parseInt(cbMin.getSelectedItem().toString());
-                int max = Integer.parseInt(cbMax.getSelectedItem().toString());
-
-                if (min > max) {
-                    textArea.setText("Error: Min Chapter can't be larger than max!");
-                } else {
-                    btTestParsing.setEnabled(false);
-                    btCreateTxt.setEnabled(false);
-                    cbMin.setEnabled(false);
-                    cbMax.setEnabled(false);
-                    new Parser(true).execute();
-                }
-            }
-        });
-
-        btCreateEpub.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int min = Integer.parseInt(cbMin.getSelectedItem().toString());
@@ -189,7 +168,7 @@ public class MainForm extends JFrame {
         });
     }
 
-    private void createTxt() {
+    private void createTxt(Integer... ch) {
         String url = novels.get(cbNovel.getSelectedItem());
         int min = Integer.parseInt(cbMin.getSelectedItem().toString());
         int max = Integer.parseInt(cbMax.getSelectedItem().toString());
@@ -197,8 +176,14 @@ public class MainForm extends JFrame {
         String[] tmb = url.split("/");
         ArrayUtils.reverse(tmb);
         String novel_name = tmb[1];
+        File filename;
 
-        File filename = new File("books\\" + novel_name + "_" + min + "-" + max + ".txt");
+        if (ch.length == 1) {
+            filename = new File("books\\" + novel_name + "_" + min + "-" + ch[0] + ".txt");
+        } else {
+            filename = new File("books\\" + novel_name + "_" + min + "-" + max + ".txt");
+        }
+
         try {
             filename.getParentFile().mkdirs();
         } catch (Exception e) {
@@ -216,6 +201,10 @@ public class MainForm extends JFrame {
         }
 
         textArea.setText(filename + " created!");
+
+        if (ch.length == 1) {
+            textArea.setText(textArea.getText().toString() + "\nthere is no more chapter after " + ch[0]);
+        }
     }
 
     {
@@ -234,7 +223,7 @@ public class MainForm extends JFrame {
      */
     private void $$$setupUI$$$() {
         panel_main = new JPanel();
-        panel_main.setLayout(new GridLayoutManager(9, 2, new Insets(10, 10, 10, 10), -1, -1));
+        panel_main.setLayout(new GridLayoutManager(8, 2, new Insets(10, 10, 10, 10), -1, -1));
         cbMin = new JComboBox();
         panel_main.add(cbMin, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         cbMax = new JComboBox();
@@ -250,7 +239,7 @@ public class MainForm extends JFrame {
         panel_main.add(btCreateTxt, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spMain = new JScrollPane();
         spMain.setHorizontalScrollBarPolicy(31);
-        panel_main.add(spMain, new GridConstraints(8, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        panel_main.add(spMain, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         textArea = new JTextArea();
         textArea.setLineWrap(true);
         textArea.setText("Welcome");
@@ -264,9 +253,6 @@ public class MainForm extends JFrame {
         addSourceButton = new JButton();
         addSourceButton.setText("Add Source");
         panel_main.add(addSourceButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        btCreateEpub = new JButton();
-        btCreateEpub.setText("Create Ebook (epub)");
-        panel_main.add(btCreateEpub, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
@@ -283,6 +269,7 @@ public class MainForm extends JFrame {
         private StringBuilder fullText = new StringBuilder();
         private String text;
         private Boolean tofile;
+        private int lastChapter = min;
 
         Parser(boolean tofile) {
             this.tofile = tofile;
@@ -294,6 +281,7 @@ public class MainForm extends JFrame {
             for (int i = min; i <= max; i++) {
                 text = parser.fetchNovel(url, i);
                 if (text == null) {
+                    lastChapter = i - 1;
                     return false;
                 } else {
                     fullText.append(text);
@@ -330,7 +318,13 @@ public class MainForm extends JFrame {
                         createTxt();
                     }
                 } else {
-                    textArea.setText("Error !");
+                    if (fullText.length() > 0) {
+                        textArea.setText("Last Chapter reached: " + lastChapter);
+                        if (tofile) {
+                            createTxt(lastChapter);
+                        }
+                    }
+
                 }
             } catch (InterruptedException e) {
                 // This is thrown if the thread's interrupted.
