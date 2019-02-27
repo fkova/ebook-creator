@@ -11,23 +11,12 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.10.2" level="project" />
-    <orderEntry type="library" name="Maven: nl.siegmann.epublib:epublib-core:3.1" level="project" />
-    <orderEntry type="library" name="Maven: net.sf.kxml:kxml2:2.3.0" level="project" />
-    <orderEntry type="library" name="Maven: xmlpull:xmlpull:1.1.3.4d_b4_min" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.6.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.8.1" level="project" />
-    <orderEntry type="library" name="Maven: com.intellij:forms_rt:6.0.5" level="project" />
-    <orderEntry type="library" name="Maven: asm:asm-commons:2.2.3" level="project" />
-    <orderEntry type="library" name="Maven: asm:asm-tree:2.2.3" level="project" />
-    <orderEntry type="library" name="Maven: asm:asm:2.2.3" level="project" />
-    <orderEntry type="library" name="Maven: com.jgoodies:forms:1.0.7" level="project" />
-    <orderEntry type="library" name="Maven: jdom:jdom:1.0" level="project" />
+    <orderEntry type="library" name="jsoup-1.11.3" level="project" />
+    <orderEntry type="library" name="commons-lang3-3.4" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/marytts-builder-5.2-jar-with-dependencies.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/forms_rt.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -36,16 +25,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/voice-cmu-slt-5.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/marytts-lang-en-5.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../_libs/epublib-core-3.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -75,6 +75,9 @@ public class MainForm extends JFrame {
             novels.put("Trash of the Counts Family / WUXIAWORLD", "https://www.wuxiaworld.com/novel/trash-of-the-counts-family/tcf-chapter-");
             novels.put("The Novels Extra / WUXIAWORLD", "https://www.wuxiaworld.com/novel/the-novels-extra/tne-chapter-");
             novels.put("A Will Eternal / WUXIAWORLD", "https://www.wuxiaworld.com/novel/a-will-eternal/awe-chapter-");
+            novels.put("Martial World / WUXIAWORLD", "https://www.wuxiaworld.com/novel/martial-world/mw-chapter-");
+            novels.put("I Alone Level-Up / MAXNOVEL", "https://www.maxnovel.com/novel/i-alone-level-up/chapter-");
+            novels.put("Nine Star Hegemon Body Art / WUXIAWORLD", "https://www.wuxiaworld.com/novel/nine-star-hegemon/nshba-chapter-");
         }
 
         for (String key : novels.keySet()) {
@@ -85,7 +88,6 @@ public class MainForm extends JFrame {
             cbMin.addItem(i);
             cbMax.addItem(i);
         }
-
     }
 
     private void setEventListeners() {
@@ -203,7 +205,7 @@ public class MainForm extends JFrame {
         textArea.setText(filename + " created!");
 
         if (ch.length == 1) {
-            textArea.setText(textArea.getText().toString() + "\nthere is no more chapter after " + ch[0]);
+            textArea.setText(textArea.getText() + "\nthere is no more chapter after " + ch[0]);
         }
     }
 
@@ -319,9 +321,11 @@ public class MainForm extends JFrame {
                     }
                 } else {
                     if (fullText.length() > 0) {
-                        textArea.setText("Last Chapter reached: " + lastChapter);
                         if (tofile) {
+                            textArea.setText(fullText.toString());
                             createTxt(lastChapter);
+                        } else {
+                            textArea.setText("Last Chapter reached: " + lastChapter);
                         }
                     }
 
